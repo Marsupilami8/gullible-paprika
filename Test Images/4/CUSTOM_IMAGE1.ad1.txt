@@ -1,0 +1,32 @@
+﻿Created By AccessData® FTK® Imager 4.1.1.1 
+
+Case Information: 
+Acquired using: ADI4.1.1.1
+Case Number: TEST CASE 123
+Evidence Number: 4
+Unique Description: AD1 Custom Content Image of file folder on C drive 
+Examiner: DFIR Team
+Notes: AD1 Custom Content Image of file folder on C drive having syspect programs
+
+--------------------------------------------------------------
+
+Information for C:\Users\Stephan\Documents\GitHub\gullible-paprika\Test Images\4\CUSTOM_IMAGE1.ad1:
+[Custom Content Sources]
+ sysinternals:C:\sysinternals|Autoruns.exe(Exact)
+ sysinternals:C:\sysinternals|Bginfo.exe(Exact)
+ sysinternals:C:\sysinternals|du.exe(Exact)
+[Computed Hashes]
+ MD5 checksum:    6825c7335c0ea2a6bfaf51664c6aa338
+ SHA1 checksum:   82839790528797e8871781257b4e3ee8097ab777
+
+Image information:
+ Acquisition started:   Sat Aug  8 18:42:47 2020
+ Acquisition finished:  Sat Aug  8 18:42:48 2020
+ Segment list:
+  C:\Users\Stephan\Documents\GitHub\gullible-paprika\Test Images\4\CUSTOM_IMAGE1.ad1
+
+Image Verification Results:
+ Verification started:  Sat Aug  8 18:42:48 2020
+ Verification finished: Sat Aug  8 18:42:48 2020
+ MD5 checksum:    6825c7335c0ea2a6bfaf51664c6aa338 : verified
+ SHA1 checksum:   82839790528797e8871781257b4e3ee8097ab777 : verified

@@ -290,3 +290,45 @@ Image Verification Results:
  Verification finished: Tue Aug 04 19:23:17 2020
  MD5 checksum:    ddf4cbc8cd90e3644a4cf56eb522424c : verified
  SHA1 checksum:   2b6d24900ad2d56f9b1b0cb6736366da6f7c7ac7 : verified
+
+Image Verification Results:
+ Verification started:  Tue Aug 04 21:00:55 2020
+ Verification finished: Tue Aug 04 21:00:59 2020
+ MD5 checksum:    ddf4cbc8cd90e3644a4cf56eb522424c : verified
+ SHA1 checksum:   2b6d24900ad2d56f9b1b0cb6736366da6f7c7ac7 : verified
+
+Image Verification Results:
+ Verification started:  Tue Aug 04 23:04:28 2020
+ Verification finished: Tue Aug 04 23:04:33 2020
+ MD5 checksum:    ddf4cbc8cd90e3644a4cf56eb522424c : verified
+ SHA1 checksum:   2b6d24900ad2d56f9b1b0cb6736366da6f7c7ac7 : verified
+
+Image Verification Results:
+ Verification started:  Tue Aug 04 23:11:35 2020
+ Verification finished: Tue Aug 04 23:11:40 2020
+ MD5 checksum:    ddf4cbc8cd90e3644a4cf56eb522424c : verified
+ SHA1 checksum:   2b6d24900ad2d56f9b1b0cb6736366da6f7c7ac7 : verified
+
+Image Verification Results:
+ Verification started:  Tue Aug 04 23:14:21 2020
+ Verification finished: Tue Aug 04 23:14:26 2020
+ MD5 checksum:    ddf4cbc8cd90e3644a4cf56eb522424c : verified
+ SHA1 checksum:   2b6d24900ad2d56f9b1b0cb6736366da6f7c7ac7 : verified
+
+Image Verification Results:
+ Verification started:  Tue Aug 04 23:15:28 2020
+ Verification finished: Tue Aug 04 23:15:33 2020
+ MD5 checksum:    ddf4cbc8cd90e3644a4cf56eb522424c : verified
+ SHA1 checksum:   2b6d24900ad2d56f9b1b0cb6736366da6f7c7ac7 : verified
+
+Image Verification Results:
+ Verification started:  Tue Aug 04 23:19:49 2020
+ Verification finished: Tue Aug 04 23:19:53 2020
+ MD5 checksum:    ddf4cbc8cd90e3644a4cf56eb522424c : verified
+ SHA1 checksum:   2b6d24900ad2d56f9b1b0cb6736366da6f7c7ac7 : verified
+
+Image Verification Results:
+ Verification started:  Sat Aug 08 18:31:32 2020
+ Verification finished: Sat Aug 08 18:31:45 2020
+ MD5 checksum:    ddf4cbc8cd90e3644a4cf56eb522424c : verified
+ SHA1 checksum:   2b6d24900ad2d56f9b1b0cb6736366da6f7c7ac7 : verified
