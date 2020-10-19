@@ -10,7 +10,7 @@ Notes: AD1 Custom Content Image of file folder on C drive having syspect program
 
 --------------------------------------------------------------
 
-Information for C:\Users\Stephan\Documents\GitHub\gullible-paprika\Test Images\4\CUSTOM_IMAGE1.ad1:
+Information for C:\Users\*****\Documents\GitHub\gullible-paprika\Test Images\4\CUSTOM_IMAGE1.ad1:
 [Custom Content Sources]
  sysinternals:C:\sysinternals|Autoruns.exe(Exact)
  sysinternals:C:\sysinternals|Bginfo.exe(Exact)
