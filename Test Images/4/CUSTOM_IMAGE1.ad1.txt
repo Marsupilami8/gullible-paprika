@@ -23,7 +23,7 @@ Image information:
  Acquisition started:   Sat Aug  8 18:42:47 2020
  Acquisition finished:  Sat Aug  8 18:42:48 2020
  Segment list:
-  C:\Users\Stephan\Documents\GitHub\gullible-paprika\Test Images\4\CUSTOM_IMAGE1.ad1
+  C:\Users\*****\Documents\GitHub\gullible-paprika\Test Images\4\CUSTOM_IMAGE1.ad1
 
 Image Verification Results:
  Verification started:  Sat Aug  8 18:42:48 2020
