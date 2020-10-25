@@ -88,7 +88,7 @@
     --------------------------------------------------------------------------------------------------------------
     Author:  Marsupilami8
     Date:    2020-10-25
-    Version: 2.1
+    Version: 2.2
 
 #>
 
@@ -102,8 +102,7 @@ $FTKImagerSupportedImageTypes = ".e01", ".s01"
 $NonFTKImagerSupportedImageTypes = ".e01x",".l01x", ".ad1", ".l01", ".dd", ".001", ".zip"
 
 # Forensic image extensions to search for when running the script
-$TargetExtensions = $FTKImagerSupportedImageTypes + $NonFTKImagerSupportedImageTypes `
-    | Foreach-Object{ "{0}{1}" -f '*', $_}        # Prepend '*' to extension for later Get-ChildItem wildcard search
+$TargetExtensions = $FTKImagerSupportedImageTypes + $NonFTKImagerSupportedImageTypes | Foreach-Object{ "{0}{1}" -f '*', $_}        # Prepend '*' to extension for later Get-ChildItem wildcard search
 
 # Test if path provided at command line argument is a folder
 if(!(Test-Path $TargetFolder -PathType Container)){
@@ -129,7 +128,7 @@ $ForensicImages = Get-ChildItem $TargetFolder -Recurse -Include $TargetExtension
 
 if (!$ForensicImages) {
 
-    $Msg = "No forensic image files were found in the $LogPath folder path to verify."
+    $Msg = "No forensic image file types were found in the $LogPath folder path to verify."
     Write-Host $Msg
     (Get-Date -Format s)  + "`r`n$Msg"| Out-File -Append -FilePath $LogFile -Encoding ascii
     exit
@@ -164,7 +163,11 @@ $NonSupportedForensicImages = New-Object -TypeName "System.Collections.ArrayList
 # Identify forensic image types supported by FTK Imager, such as E01 and S01 format, to run verification script.
 foreach($Image in $ForensicImages){
 
- if ($Image.Extension -IIN $NonFTKImagerSupportedImageTypes) {
+ if ($Image.Extension -IIN $FTKImagerSupportedImageTypes) {
+
+    $SupportedForensicImages.Add($Image) | Out-Null 
+    
+ } elseif ($Image.Extension -IIN $NonFTKImagerSupportedImageTypes){
 
     $Msg =  (Get-Date -Format s) + "`r`n$Image`r`nThe verification of this image type is unsupported. " `
        + "Please verify using an alternate method." `
@@ -174,10 +177,6 @@ foreach($Image in $ForensicImages){
 
     $NonSupportedForensicImages.Add($Image) | Out-Null  # Prevents ArrayList index number from echoing to console
 
- } elseif ($Image.Extension -IIN $FTKImagerSupportedImageTypes){
-
-    $SupportedForensicImages.Add($Image) | Out-Null 
-
  } else {
 
     continue
@@ -185,24 +184,34 @@ foreach($Image in $ForensicImages){
 }
 
 # Update to console on images being verified
-Write-Host "`r`nThe following images are unsupported and cannot be verified with this tool: `
-    `r`n$($NonSupportedForensicImages -join "`r`n")`r`n" -ForegroundColor Red
+if($NonSupportedForensicImages.Count -gt 0) {
+    Write-Host "`r`nThe verification of the following image types are UNSUPPORTED by FTK Imager: `
+        `r`n$($NonSupportedForensicImages -join "`r`n")`r`n" 
+}
 
-Write-Host "`r`nVerifying the following images ... `
-    `r`n$($SupportedForensicImages -join "`r`n")`r`n" -ForegroundColor Yellow
+if($SupportedForensicImages.Count -gt 0) {
+    Write-Host "`r`nVerifying the following images ... `
+        `r`n$($SupportedForensicImages -join "`r`n")`r`n" -ForegroundColor Yellow
 
 # Limit to no greater than 20 background jobs and check again in 3 min for freed jobs 
-foreach($Image in $SupportedForensicImages){
+    foreach($Image in $SupportedForensicImages){
 
-   while ((Get-Job -State Running).Count -ge 20) {
+        while ((Get-Job -State Running).Count -ge 20) {
+        Start-Sleep -Seconds 180;
+    }
 
-      Start-Sleep -Seconds 180;
-   }
-
-   Start-Job -Scriptblock $Script -ArgumentList $Image.FullName -Name (Split-Path $Image -Leaf)
+    Start-Job -Scriptblock $Script -ArgumentList $Image.FullName -Name (Split-Path $Image -Leaf)
 }
 
 # Push out background job results to logged date/time stamped file.
 Get-Job | Wait-Job | Receive-Job | Out-File -Append -FilePath $LogFile -Encoding ascii
 
-Write-Host "`r`nImage hash verifications completed. See the $LogFile file for results." -ForegroundColor Green
+} else {
+
+    Write-Host "`r`nNo supported image file hash verifications were completed." `
+    "See the $LogFile file." 
+    exit
+}
+
+Write-Host "`r`nImage hash verifications completed. See the $LogFile file" `
+    "for the results." -ForegroundColor Green
