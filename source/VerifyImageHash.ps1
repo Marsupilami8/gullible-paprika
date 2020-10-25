@@ -107,6 +107,18 @@ else {
 
 $LogFile = $OutputFolder +"\" + (Get-Date -Format "yyyyMMddTHHmmss")  + "-ImageHashVerification.txt"
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+if (!$ForensicImages) {
+
+    $Msg = "No forensic image files were found in the $LogPath folder path to verify."
+    Write-Host $Msg
+    (Get-Date -Format s)  + "`r`n$Msg"| Out-File -Append -FilePath $LogFile -Encoding ascii
+    exit
+=======
+>>>>>>> parent of be6708c... Improved extensibility
+=======
+>>>>>>> parent of be6708c... Improved extensibility
 }
 
 # Create the construct for the computed hash verification output and acquisition notes 
@@ -121,12 +133,21 @@ $Script =  {
         $HashVerification = cmd.exe /c ftkimager.exe $File --verify --quiet '2>&1' | Out-String
         $Footer = "`r`n---------------------------------------------------------`r`n"  
         $Results = $Header + $ImageInfo + $HashVerification + $Footer 
+<<<<<<< HEAD
     }
     else {
 
         $Results = "Error: $File Not Found."
         Exit
     }
+=======
+    }
+    else {
+
+        $Results = "Error: $File Not Found."
+        Exit
+    }
+>>>>>>> parent of be6708c... Improved extensibility
    
    Write-Output -InputObject $Results
    }
@@ -152,9 +173,15 @@ $NonSupportedForensicImages = New-Object -TypeName "System.Collections.ArrayList
 foreach($Image in $ForensicImages){
 
  if ($Image.Extension -IN ".e01x", ".ad1", ".l01", ".l01x", ".dd", ".001", ".zip") {
+<<<<<<< HEAD
 
     $NonSupportedForensicImages.Add($Image) | Out-Null  # Prevents ArrayList index number from echoing to console
 
+=======
+
+    $NonSupportedForensicImages.Add($Image) | Out-Null  # Prevents ArrayList index number from echoing to console
+
+>>>>>>> parent of be6708c... Improved extensibility
     $NonSupportMsg =  (Get-Date -Format s) + "`r`n$Image`r`nThe verification of this image type is unsupported. " `
        + "Please verify using an alternate method." `
        + "`r`n---------------------------------------------------------`r`n" 
