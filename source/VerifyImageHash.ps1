@@ -6,7 +6,7 @@
 
 .DESCRIPTION
     The VerifyImageHash.ps1 Powershell script is a command line executable wrapper used to conduct a recursive MD5 
-    and SHA1 hash verification of E01/S01 forensic images in a drive folder using AccessData's legacy Windows FTK 
+    and SHA1 hash verification of E01 & S01 forensic images in a drive folder using AccessData's legacy Windows FTK 
     Imager Command Line Interface tool (version 3.1.1). The script uses background jobs to run multiple hash 
     verifications at a time. The output is a text file "yyyyMMddTHHmmss-ImageHashVerification.txt" containing the 
     notes from each of the forensic image acquisitions and the results of the computed MD5 and SHA1 hash 
@@ -88,7 +88,7 @@
     --------------------------------------------------------------------------------------------------------------
     Author:  Marsupilami8
     Date:    2020-10-25
-    Version: 2.2
+    Version: 2.2.1
 
 #>
 
@@ -99,10 +99,11 @@ param (
 
 # File extension definitions
 $FTKImagerSupportedImageTypes = ".e01", ".s01"
-$NonFTKImagerSupportedImageTypes = ".e01x",".l01x", ".ad1", ".l01", ".dd", ".001", ".zip"
+$NonFTKImagerSupportedImageTypes = ".e01x",".l01x", ".l01", ".ad1", ".dd", ".001", ".zip"
 
 # Forensic image extensions to search for when running the script
-$TargetExtensions = $FTKImagerSupportedImageTypes + $NonFTKImagerSupportedImageTypes | Foreach-Object{ "{0}{1}" -f '*', $_}        # Prepend '*' to extension for later Get-ChildItem wildcard search
+$TargetExtensions = $FTKImagerSupportedImageTypes + $NonFTKImagerSupportedImageTypes `
+    | Foreach-Object{ "{0}{1}" -f '*', $_}  # Prepend '*' to extension for later Get-ChildItem wildcard search
 
 # Test if path provided at command line argument is a folder
 if(!(Test-Path $TargetFolder -PathType Container)){
@@ -130,7 +131,7 @@ if (!$ForensicImages) {
 
     $Msg = "No forensic image file types were found in the $LogPath folder path to verify."
     Write-Host $Msg
-    (Get-Date -Format s)  + "`r`n$Msg"| Out-File -Append -FilePath $LogFile -Encoding ascii
+    (Get-Date -Format s) + "`r`n$Msg"| Out-File -Append -FilePath $LogFile -Encoding ascii
     exit
 }
 
@@ -179,32 +180,37 @@ foreach($Image in $ForensicImages){
 
  } else {
 
-    continue
- }
+        continue
+    }
 }
 
-# Update to console on images being verified
+# Update console on image types not being verified
 if($NonSupportedForensicImages.Count -gt 0) {
     Write-Host "`r`nThe verification of the following image types are UNSUPPORTED by FTK Imager: `
         `r`n$($NonSupportedForensicImages -join "`r`n")`r`n" 
 }
 
+# Update console on images being verified and invoke background jobs
 if($SupportedForensicImages.Count -gt 0) {
     Write-Host "`r`nVerifying the following images ... `
         `r`n$($SupportedForensicImages -join "`r`n")`r`n" -ForegroundColor Yellow
 
-# Limit to no greater than 20 background jobs and check again in 3 min for freed jobs 
+    # Limit to no greater than 20 background jobs and check again in 3 min for freed jobs 
     foreach($Image in $SupportedForensicImages){
 
         while ((Get-Job -State Running).Count -ge 20) {
-        Start-Sleep -Seconds 180;
+            Start-Sleep -Seconds 180;
+        }
+
+        Start-Job -Scriptblock $Script -ArgumentList $Image.FullName -Name (Split-Path $Image -Leaf)
     }
 
-    Start-Job -Scriptblock $Script -ArgumentList $Image.FullName -Name (Split-Path $Image -Leaf)
-}
+    # Push out background job results to logged date/time stamped file.
+    Get-Job | Wait-Job | Receive-Job | Out-File -Append -FilePath $LogFile -Encoding ascii
 
-# Push out background job results to logged date/time stamped file.
-Get-Job | Wait-Job | Receive-Job | Out-File -Append -FilePath $LogFile -Encoding ascii
+    Write-Host "`r`nImage hash verifications completed. See the $LogFile file" `
+        "for the results." -ForegroundColor Green
+    exit
 
 } else {
 
@@ -212,6 +218,3 @@ Get-Job | Wait-Job | Receive-Job | Out-File -Append -FilePath $LogFile -Encoding
     "See the $LogFile file." 
     exit
 }
-
-Write-Host "`r`nImage hash verifications completed. See the $LogFile file" `
-    "for the results." -ForegroundColor Green
