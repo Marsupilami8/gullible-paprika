@@ -62,8 +62,8 @@
 
 .LINK
     https://accessdata.com/product-download/windows-32bit-3-1-1
+    https://support.accessdata.com/hc/en-us/articles/204768518-Using-Command-Line-CLI-Imager
     https://docs.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)
-    https://helpdeskgeek.com/windows-10/add-windows-path-environment-variable/
     https://github.com/libyal/libewf
     https://github.com/Marsupilami8/gullible-paprika/
 
@@ -71,11 +71,11 @@
     The FTK Imager command line tool (version 3.1.1) must be downloaded from Accessdata and installed to a folder 
     of your choice (See link). It is recommended that the path to the "ftkimager.exe" executable be placed in the
     system's PATH environment variable; otherwise, its explicit path must be hardcoded in this script. See link for
-    assistance on adding the executable's path to the PATH environment variable.
+    assistance on adding the executable's path to the PATH environment variable (See link).
     
     The FTK Imager tool does not work to verify images in AD1, L01, DD, or any other formats. This is a limitation 
-    of "ftkimager.exe" and not the powershell script. Other than Linux command tools, e.g. ewf,  no other windows 
-    command line tools exists to verify image types such as E01x, L01, AD1, etc ... 
+    of "ftkimager.exe" and not the powershell script. Other than Linux command tools, e.g. ewf,  it is not known if
+    other windows command line tools exists to verify image types such as E01x, L01, AD1, etc ... 
     
     The number of background jobs is limited to 20. When a max is achieved, no other jobs are started until a job 
     is freed, after a timed waiting period. It is conceivable that this ceiling can be raised; however, no stress 
@@ -85,10 +85,13 @@
     text file. This does not impact any results. 
 
     Testing to pipe to the VerifyImageHash.ps1 script has not been developed or tested.
+
+    Recent versions of FTK Imager can be invoked at the command line for scripts, but they invoke a GUI for 
+    verification and interaction. This had not been explored for utilization.
     --------------------------------------------------------------------------------------------------------------
     Author:  Marsupilami8
     Date:    2020-10-25
-    Version: 2.2.1
+    Version: 2.3
 
 #>
 
@@ -101,9 +104,35 @@ param (
 $FTKImagerSupportedImageTypes = ".e01", ".s01"
 $NonFTKImagerSupportedImageTypes = ".e01x",".l01x", ".l01", ".ad1", ".dd", ".001", ".zip"
 
+# Static variables
+$BackgroundJobs = 20        # Ceiling for the number of background jobs allowed with the script
+$WaitTime = 180             # Wait time in seconds to check again for freed jobs if background jobs at max
+
 # Forensic image extensions to search for when running the script
 $TargetExtensions = $FTKImagerSupportedImageTypes + $NonFTKImagerSupportedImageTypes `
     | Foreach-Object{ "{0}{1}" -f '*', $_}  # Prepend '*' to extension for later Get-ChildItem wildcard search
+
+# Create the construct for the computed hash verification output and acquisition notes 
+$Script =  { 
+
+    param($File)
+ 
+     if(Test-Path $File){
+ 
+         $Header = (Get-Date -Format s)  + "`r`n$File`r`n"
+         $ImageInfo = cmd.exe /c ftkimager.exe $File --print-info '2>&1' | Out-String    
+         $HashVerification = cmd.exe /c ftkimager.exe $File --verify --quiet '2>&1' | Out-String
+         $Footer = "`r`n---------------------------------------------------------`r`n"  
+         $Results = $Header + $ImageInfo + $HashVerification + $Footer 
+     }
+     else {
+ 
+         $Results = "Error: $File Not Found."
+         exit
+     }
+    
+    Write-Output -InputObject $Results
+    }
 
 # Test if path provided at command line argument is a folder
 if(!(Test-Path $TargetFolder -PathType Container)){
@@ -134,28 +163,6 @@ if (!$ForensicImages) {
     (Get-Date -Format s) + "`r`n$Msg"| Out-File -Append -FilePath $LogFile -Encoding ascii
     exit
 }
-
-# Create the construct for the computed hash verification output and acquisition notes 
-$Script =  { 
-
-    Param($File)
- 
-     if(Test-Path $File){
- 
-         $Header = (Get-Date -Format s)  + "`r`n$File`r`n"
-         $ImageInfo = cmd.exe /c ftkimager.exe $File --print-info '2>&1' | Out-String    
-         $HashVerification = cmd.exe /c ftkimager.exe $File --verify --quiet '2>&1' | Out-String
-         $Footer = "`r`n---------------------------------------------------------`r`n"  
-         $Results = $Header + $ImageInfo + $HashVerification + $Footer 
-     }
-     else {
- 
-         $Results = "Error: $File Not Found."
-         exit
-     }
-    
-    Write-Output -InputObject $Results
-    }
 
 # Using ArrayList for better results and extensibility
 $SupportedForensicImages = New-Object -TypeName "System.Collections.ArrayList"      
@@ -198,8 +205,8 @@ if($SupportedForensicImages.Count -gt 0) {
     # Limit to no greater than 20 background jobs and check again in 3 min for freed jobs 
     foreach($Image in $SupportedForensicImages){
 
-        while ((Get-Job -State Running).Count -ge 20) {
-            Start-Sleep -Seconds 180;
+        while ((Get-Job -State Running).Count -ge $BackgroundJobs) {
+            Start-Sleep -Seconds $WaitTime;
         }
 
         Start-Job -Scriptblock $Script -ArgumentList $Image.FullName -Name (Split-Path $Image -Leaf)
@@ -210,11 +217,9 @@ if($SupportedForensicImages.Count -gt 0) {
 
     Write-Host "`r`nImage hash verifications completed. See the $LogFile file" `
         "for the results." -ForegroundColor Green
-    exit
 
 } else {
 
     Write-Host "`r`nNo supported image file hash verifications were completed." `
     "See the $LogFile file." 
-    exit
 }
