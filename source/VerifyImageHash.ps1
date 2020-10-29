@@ -5,10 +5,10 @@
     legacy Windows FTK Imager Command Line Interface tool.
 
 .DESCRIPTION
-    The VerifyImageHash.ps1 Powershell script is a command line executable wrapper used to conduct a recursive MD5 
-    and SHA1 hash verification of E01 & S01 forensic images in a drive folder using AccessData's legacy Windows FTK 
-    Imager Command Line Interface tool (version 3.1.1). The script uses background jobs to run multiple hash 
-    verifications at a time. The output is a text file "yyyyMMddTHHmmss-ImageHashVerification.txt" containing the 
+    The Verify-ImageHash.ps1 Powershell script is a command line executable wrapper used to conduct a recursive MD5 
+    and SHA1 hash verification of E01 & S01 forensic images located in a drive folder using AccessData's legacy 
+    Windows FTK Imager Command Line Interface tool (version 3.1.1). The script uses background jobs to run multiple 
+    hash verifications at a time. The output is a text file "yyyyMMddTHHmmss-ImageHashVerification.txt" containing the 
     notes from each of the forensic image acquisitions and the results of the computed MD5 and SHA1 hash 
     verifications.
 
@@ -19,7 +19,7 @@
     Volume path to folder where the verification file log will be outputted.
 
 .EXAMPLE
-    VerifyImageHash.ps1
+    Verify-ImageHash.ps1
 
     Copy the script to the root folder containing all the forensic images. Open a Powershell terminal to the root 
     location in the uppermost root folder of all the E01 and S01 images. This can be done, for example, by typing 
@@ -28,20 +28,20 @@
     folder as the script.
  
 .EXAMPLE
-    VerifyImageHash.ps1 -TargetFolder "D:\IMAGES\TX1\" -LogPath "E:\DFIR\Case 123\Image Logs\"
+    Verify-ImageHash.ps1 -TargetFolder "D:\IMAGES\TX1\" -LogPath "E:\DFIR\Case 123\Image Logs\"
     
     Open a Powershell terminal. Run the script and provide the target folder's path to the volume and root folder 
     containing the forensic images. Designate the output folder where the verification text file will be generated.
 
 .EXAMPLE
-    VerifyImageHash.ps1 -TargetFolder "D:\IMAGES\TX1\"    
+    Verify-ImageHash.ps1 -TargetFolder "D:\IMAGES\TX1\"    
 
     Open a Powershell terminal. Run the script and provide the target folder's path to the volume and root folder 
     containing the forensic images. The verification text file output will be generated in the folder from where 
     the script was run.
 
 .EXAMPLE
-    VerifyImageHash.ps1 -LogPath "E:\DFIR\Case 123\Image Logs\"
+    Verify-ImageHash.ps1 -LogPath "E:\DFIR\Case 123\Image Logs\"
 
     Open a Powershell terminal. Run the script and provide the output folder where the verification text file will
     be generated. The default image containers are assumed to be in the same folder as the script.
@@ -71,7 +71,7 @@
     The FTK Imager command line tool (version 3.1.1) must be downloaded from Accessdata and installed to a folder 
     of your choice (See link). It is recommended that the path to the "ftkimager.exe" executable be placed in the
     system's PATH environment variable; otherwise, its explicit path must be hardcoded in this script. See link for
-    assistance on adding the executable's path to the PATH environment variable (See link).
+    assistance on adding the executable's path to the PATH environment variable.
     
     The FTK Imager tool does not work to verify images in AD1, L01, DD, or any other formats. This is a limitation 
     of "ftkimager.exe" and not the powershell script. Other than Linux command tools, e.g. ewf,  it is not known if
@@ -84,14 +84,14 @@
     The script outputs the ftkimager.exe command line stderr messages to stdout, which will be captured in the log 
     text file. This does not impact any results. 
 
-    Testing to pipe to the VerifyImageHash.ps1 script has not been developed or tested.
+    Testing to pipe to the Verify-ImageHash.ps1 script has not been developed or tested.
 
     Recent versions of FTK Imager can be invoked at the command line for scripts, but they invoke a GUI for 
     verification and interaction. This had not been explored for utilization.
     --------------------------------------------------------------------------------------------------------------
     Author:  Marsupilami8
-    Date:    2020-10-25
-    Version: 2.3
+    Date:    2020-10-28
+    Version: 2.3.3
 
 #>
 
@@ -193,13 +193,13 @@ foreach($Image in $ForensicImages){
 
 # Update console on image types not being verified
 if($NonSupportedForensicImages.Count -gt 0) {
-    Write-Host "`r`nThe verification of the following image types are UNSUPPORTED by FTK Imager: `
-        `r`n$($NonSupportedForensicImages -join "`r`n")`r`n" 
+    Write-Host "`r`nThe verification of the following files are UNSUPPORTED by FTK Imager: `
+        `r`n$($NonSupportedForensicImages -join "`r`n")`r`n" -ForegroundColor Red
 }
 
 # Update console on images being verified and invoke background jobs
 if($SupportedForensicImages.Count -gt 0) {
-    Write-Host "`r`nVerifying the following images ... `
+    Write-Host "`r`nVerifying the following forensic images ... `
         `r`n$($SupportedForensicImages -join "`r`n")`r`n" -ForegroundColor Yellow
 
     # Limit to no greater than 20 background jobs and check again in 3 min for freed jobs 
