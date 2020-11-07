@@ -221,5 +221,5 @@ if($SupportedForensicImages.Count -gt 0) {
 } else {
 
     Write-Host "`r`nNo supported image file hash verifications were completed." `
-    "See the $LogFile file." 
+        "See the $LogFile file." 
 }
